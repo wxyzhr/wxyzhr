@@ -1,0 +1,39 @@
+# 1. 工作流名称（自定义，会显示在Actions页面）
+name: Python CI/CD Demo
+
+# 2. 触发条件：当main分支有Push/Pull Request时，自动执行这个工作流
+on:
+  push:
+    branches: [ "main" ]  # 仅监听main分支的Push操作
+  pull_request:
+    branches: [ "main" ]  # 仅监听main分支的Pull Request操作
+
+# 3. 任务（Jobs）：CI/CD的核心执行单元，一个工作流可以有多个Jobs
+jobs:
+  # 3.1 定义一个名为"test"的任务（自定义）
+  test:
+    # 3.2 运行环境：GitHub提供的虚拟服务器（支持ubuntu-latest/windows-latest/macos-latest）
+    runs-on: ubuntu-latest
+
+    # 3.3 步骤（Steps）：任务的具体执行步骤，按顺序执行
+    steps:
+      # 步骤1：拉取仓库代码到虚拟服务器（必须步骤，否则无法操作代码）
+      - name: Checkout code  # 步骤名称（自定义，方便查看日志）
+        uses: actions/checkout@v4  # 使用GitHub官方的"拉取代码"动作（Action）
+
+      # 步骤2：设置Python环境（自动匹配项目需要的Python版本）
+      - name: Set up Python
+        uses: actions/setup-python@v5  # GitHub官方的"Python环境配置"动作
+        with:
+          python-version: '3.10'  # 指定Python版本（可根据项目调整）
+
+      # 步骤3：安装依赖（本例无额外依赖，仅演示语法）
+      - name: Install dependencies
+        run: |  # run：执行Shell命令（多行用|）
+          python -m pip install --upgrade pip  # 升级pip
+          # 若有requirements.txt，可添加：pip install -r requirements.txt
+
+      # 步骤4：运行单元测试（核心步骤，验证代码正确性）
+      - name: Run unit tests
+        run: |
+          python -m unittest test_calculator.py -v  # -v：显示详细测试结果
